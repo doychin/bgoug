@@ -13,9 +13,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.Border;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
@@ -33,8 +31,8 @@ public class JavaFXController implements Initializable {
     @FXML
     TextField txtIterations;
 
-    @FXML
-    GridPane cellGrid;
+//    @FXML
+//    GridPane cellGrid;
 
     @FXML
     CheckBox chkParallelStreams;
@@ -58,10 +56,10 @@ public class JavaFXController implements Initializable {
     CheckBox chkUpdateUI;
 
     @FXML
-    Label lblSize;
+    BorderPane borderPane;
 
     @FXML
-    BorderPane borderPane;
+    Pane flowPane;
 
     private SimpleBooleanProperty validInput = new SimpleBooleanProperty(true);
     private int iterations;
@@ -114,9 +112,9 @@ public class JavaFXController implements Initializable {
                 return;
             }
             double cellWidth = borderPane.getWidth() / width;
-            double cellHeight = (borderPane.getHeight() - 37 - 28) / height;
+            double cellHeight = (borderPane.getHeight() - 80) / height;
 
-            for (Node node : cellGrid.getChildren()) {
+            for (Node node : flowPane.getChildren()) {
                 if (!(node instanceof Rectangle)) {
                     continue;
                 }
@@ -124,15 +122,14 @@ public class JavaFXController implements Initializable {
                 Rectangle r = (Rectangle) node;
                 r.setWidth(cellWidth);
                 r.setHeight(cellHeight);
+                Cell cell = (Cell) r.getUserData();
+                r.setLayoutX(cell.getX() * cellWidth);
+                r.setLayoutY(cell.getY() * cellHeight);
             }
         };
 
-        cellGrid.widthProperty().addListener(dimensionsListener);
-        cellGrid.heightProperty().addListener(dimensionsListener);
-
-        lblSize.textProperty()
-               .bind(Bindings.createStringBinding(() -> String.format("%1$g, %2$g", cellGrid.getWidth(), cellGrid.getHeight()), cellGrid
-                       .widthProperty(), cellGrid.heightProperty()));
+        borderPane.widthProperty().addListener(dimensionsListener);
+        borderPane.heightProperty().addListener(dimensionsListener);
     }
 
     private int checkNumericValue(int min, int max, TextField textField) {
@@ -158,9 +155,14 @@ public class JavaFXController implements Initializable {
             super(x, y);
 
             Rectangle cell = new Rectangle(width, height);
+            cell.setUserData(this);
             cell.fillProperty()
                 .bind(Bindings.createObjectBinding(() -> liveProperty.get() ? Color.GREEN : Color.BLACK, liveProperty));
-            cellGrid.add(cell, x, y);
+            cell.setLayoutX(x * width);
+            cell.setLayoutY(y * height);
+            cell.setArcHeight(0);
+            cell.setArcWidth(0);
+            flowPane.getChildren().add(cell);
         }
 
         SimpleBooleanProperty liveProperty = new SimpleBooleanProperty();
@@ -175,9 +177,7 @@ public class JavaFXController implements Initializable {
     }
 
     public void start() {
-        cellGrid.getColumnConstraints().clear();
-        cellGrid.getRowConstraints().clear();
-        cellGrid.getChildren().clear();
+        flowPane.getChildren().clear();
 
         int width = getTextFieldIntValue(txtGridWidth);
         int height = getTextFieldIntValue(txtGridHeight);
@@ -185,8 +185,8 @@ public class JavaFXController implements Initializable {
 
         game = new LiveGame(width, height, chkParallelStreams.isSelected());
 
-        double cellWidth = cellGrid.getWidth() / width;
-        double cellHeight = cellGrid.getHeight() / height;
+        double cellWidth = borderPane.getWidth() / width;
+        double cellHeight = (borderPane.getHeight() - 80) / height;
 
         game.initialize((x, y) -> new JavaFXCell(x, y, cellWidth, cellHeight));
         final Task task = new Task() {

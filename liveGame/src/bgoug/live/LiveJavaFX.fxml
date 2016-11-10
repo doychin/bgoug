@@ -8,8 +8,6 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.Pane?>
 
 <BorderPane fx:id="borderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="580.0" prefWidth="906.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bgoug.live.JavaFXController">
@@ -25,7 +23,6 @@
             <CheckBox fx:id="chkParallelStreams" layoutX="421.0" layoutY="9.0" mnemonicParsing="false" text="Parallel streams" />
             <CheckBox fx:id="chkUpdateUI" layoutX="537.0" layoutY="9.0" mnemonicParsing="false" text="Update UI on fast run" />
             <Button fx:id="startButton" layoutX="712.0" layoutY="6.0" mnemonicParsing="false" onAction="#start" prefHeight="25.0" prefWidth="78.0" text="Start" AnchorPane.rightAnchor="14.0" />
-            <Label fx:id="lblSize" layoutX="685.0" layoutY="10.0" prefHeight="17.0" prefWidth="108.0" text="Label" />
          </children>
          <BorderPane.margin>
             <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
@@ -56,10 +53,6 @@
       </BorderPane>
    </bottom>
    <center>
-      <GridPane fx:id="cellGrid" BorderPane.alignment="CENTER">
-         <columnConstraints>
-            <ColumnConstraints minWidth="10.0" prefWidth="100.0" />
-         </columnConstraints>
-      </GridPane>
+      <Pane fx:id="flowPane" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
    </center>
 </BorderPane>

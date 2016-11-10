@@ -17,11 +17,11 @@ public class LiveGame {
     }
 
     private Cell[][] cells;
-    private int n, m;
+    private int width, height;
 
-    public LiveGame(int n, int m, boolean parallelStreams) {
-        this.n = n;
-        this.m = m;
+    public LiveGame(int width, int height, boolean parallelStreams) {
+        this.height = height;
+        this.width = width;
         this.parallelStreams = parallelStreams;
     }
 
@@ -37,7 +37,7 @@ public class LiveGame {
 
         s.nextLine();
 
-        printGrid(game.getCells());
+        // printGrid(game.getCells());
         long start = System.currentTimeMillis();
 
         while (cycles > 0) {
@@ -49,7 +49,7 @@ public class LiveGame {
             // s.nextLine();
         }
         long totalTime = System.currentTimeMillis() - start;
-        printGrid(game.getCells());
+        // printGrid(game.getCells());
         System.out.println(String.format("Total time for %1$d iterations is %2$dms",tmpCycles, totalTime));
     }
 
@@ -83,10 +83,10 @@ public class LiveGame {
      * Initialize cells array and generate random cell status
      */
     void initialize(CellSupplier cellSupplier) {
-        cells = new Cell[n][m];
+        cells = new Cell[height][width];
 
-        IntStream.range(0, n).forEach(y ->
-                IntStream.range(0, m).forEach(x -> cells[y][x] = cellSupplier.createCell(x, y)));
+        IntStream.range(0, height).forEach(y ->
+                IntStream.range(0, width).forEach(x -> cells[y][x] = cellSupplier.createCell(x, y)));
 
         Random r = new Random();
         constructCellStream(false).forEach(c -> c.setLive(r.nextBoolean()));
@@ -97,10 +97,10 @@ public class LiveGame {
         int y = cell.getY();
 
         int startX = x > 0 ? x - 1 : 0;
-        int endX = x < n - 1 ? x + 1 : n - 1;
+        int endX = x < width - 1 ? x + 1 : width - 1;
 
         int startY = y > 0 ? y - 1 : 0;
-        int endY = y < m - 1 ? y + 1 : m - 1;
+        int endY = y < height - 1 ? y + 1 : height - 1;
 
         List<Cell> neighboursList = Arrays.stream(cells, startY, endY + 1)
                                           .flatMap(cellsLine -> Arrays.stream(cellsLine, startX, endX + 1))
