@@ -32,31 +32,47 @@ public class LiveGame {
         int cycles = s.nextInt();
         int tmpCycles = cycles;
 
-        LiveGame game = new LiveGame(n, m, false);
-        game.initialize(Cell::new);
+        LiveGame game = new LiveGame(n, m, true);
+        game.initializeImperative(Cell::new);
 
         s.nextLine();
 
-        // printGrid(game.getCells());
+        if (m < 10 && n < 10)
+            printGrid(game.getCells());
         long start = System.currentTimeMillis();
 
         while (cycles > 0) {
-            game.nextIteration();
-
-            // printGrid(game.getCells());
+            game.nextIterationImperative();
 
             cycles--;
-            // s.nextLine();
         }
         long totalTime = System.currentTimeMillis() - start;
-        // printGrid(game.getCells());
-        System.out.println(String.format("Total time for %1$d iterations is %2$dms",tmpCycles, totalTime));
+        if (m < 10 && n < 10)
+            printGrid(game.getCells());
+        System.out.println(String.format("Total time for %1$d iterations is %2$dms", tmpCycles, totalTime));
     }
 
     /**
      * Run next game iteration
      */
-    void nextIteration() {
+    void nextIterationImperative() {
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                updateCellState(cells[y][x]);
+            }
+        }
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                cells[y][x].apply();
+            }
+        }
+    }
+
+    /**
+     * Run next game iteration
+     */
+    void nextIterationFunctional() {
         constructCellStream(parallelStreams).forEach(this::updateCellState);
         constructCellStream(parallelStreams).forEach(Cell::apply);
     }
@@ -79,17 +95,29 @@ public class LiveGame {
         return cellStream;
     }
 
+    // Imperative style
+    void initializeImperative(CellSupplier cellSupplier) {
+        cells = new Cell[height][width];
+        Random r = new Random();
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                cells[y][x] = cellSupplier.createCell(x, y);
+                cells[y][x].setLive(r.nextBoolean());
+            }
+        }
+    }
+
     /**
      * Initialize cells array and generate random cell status
      */
-    void initialize(CellSupplier cellSupplier) {
+    void initializeFunctional(CellSupplier cellSupplier) {
         cells = new Cell[height][width];
 
-        IntStream.range(0, height).forEach(y ->
-                IntStream.range(0, width).forEach(x -> cells[y][x] = cellSupplier.createCell(x, y)));
-
         Random r = new Random();
-        constructCellStream(false).forEach(c -> c.setLive(r.nextBoolean()));
+        IntStream.range(0, height).forEach(y ->
+                IntStream.range(0, width)
+                         .forEach(x -> cells[y][x] = cellSupplier.createCell(x, y)
+                                                                 .setLive(r.nextBoolean())));
     }
 
     private void updateCellState(Cell cell) {
@@ -102,19 +130,32 @@ public class LiveGame {
         int startY = y > 0 ? y - 1 : 0;
         int endY = y < height - 1 ? y + 1 : height - 1;
 
-        List<Cell> neighboursList = Arrays.stream(cells, startY, endY + 1)
-                                          .flatMap(cellsLine -> Arrays.stream(cellsLine, startX, endX + 1))
-                                          .filter(c -> c != cell)
-                                          .collect(Collectors.toList());
-
-        Map<Boolean, List<Cell>> liveAndDeadMap = neighboursList.stream()
-                                                                .collect(Collectors.groupingBy(Cell::isLive));
-        int liveCells = liveAndDeadMap.get(Boolean.TRUE) != null ? liveAndDeadMap.get(Boolean.TRUE).size() : 0;
+        long liveCells = countLiveCellsFunctional(cell, startX, endX, startY, endY);
         if (cell.isLive()) {
             cell.setNextState(!(liveCells < 2 || liveCells > 3));
         } else {
             cell.setNextState(liveCells == 3);
         }
+    }
+
+    private long countLiveCellsImperative(Cell cell, int startX, int endX, int startY, int endY) {
+        long liveCells = 0;
+        for (int y = startY; y <= endY; y++)
+            for (int x = startX; x < endX; x++) {
+                if (cells[y][x] == cell) continue;
+                if (cells[y][x].isLive())
+                    liveCells++;
+            }
+
+        return liveCells;
+    }
+
+    private long countLiveCellsFunctional(Cell cell, int startX, int endX, int startY, int endY) {
+        return Arrays.stream(cells, startY, endY + 1)
+                     .flatMap(cellsLine -> Arrays.stream(cellsLine, startX, endX + 1))
+                     .filter(c -> c != cell)
+                     .filter(Cell::isLive)
+                     .count();
     }
 
     private static void printGrid(Cell[][] cells) {
@@ -124,5 +165,6 @@ public class LiveGame {
         });
         System.out.println("---------------------------------------");
     }
+
 
 }

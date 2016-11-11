@@ -26,8 +26,9 @@ public class Cell {
         return live;
     }
 
-    public void setLive(boolean live) {
+    public Cell setLive(boolean live) {
         this.live = live;
+        return this;
     }
 
     public void setNextState(boolean nextState) {

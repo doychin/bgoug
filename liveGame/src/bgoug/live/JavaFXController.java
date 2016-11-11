@@ -168,11 +168,11 @@ public class JavaFXController implements Initializable {
         SimpleBooleanProperty liveProperty = new SimpleBooleanProperty();
 
         @Override
-        public void setLive(boolean live) {
+        public Cell setLive(boolean live) {
             if (updateUI) {
                 Platform.runLater(() -> liveProperty.set(live));
             }
-            super.setLive(live);
+            return super.setLive(live);
         }
     }
 
@@ -188,7 +188,7 @@ public class JavaFXController implements Initializable {
         double cellWidth = borderPane.getWidth() / width;
         double cellHeight = (borderPane.getHeight() - 80) / height;
 
-        game.initialize((x, y) -> new JavaFXCell(x, y, cellWidth, cellHeight));
+        game.initializeFunctional((x, y) -> new JavaFXCell(x, y, cellWidth, cellHeight));
         final Task task = new Task() {
             @Override
             protected Object call() throws Exception {
@@ -206,7 +206,7 @@ public class JavaFXController implements Initializable {
                     if (!updateUI) {
                         updateUI = progress == iterations - 1;
                     }
-                    game.nextIteration();
+                    game.nextIterationFunctional();
                     updateProgress(++progress, iterations);
                 }
 
