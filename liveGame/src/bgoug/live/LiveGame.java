@@ -12,44 +12,17 @@ public class LiveGame {
 
     private final boolean parallelStreams;
 
-    private Cell[][] getCells() {
+    Cell[][] getCells() {
         return cells;
     }
 
     private Cell[][] cells;
     private int width, height;
 
-    public LiveGame(int width, int height, boolean parallelStreams) {
+    LiveGame(int width, int height, boolean parallelStreams) {
         this.height = height;
         this.width = width;
         this.parallelStreams = parallelStreams;
-    }
-
-    public static void main(String[] args) {
-        Scanner s = new Scanner(System.in);
-        int n = s.nextInt();
-        int m = s.nextInt();
-        int cycles = s.nextInt();
-        int tmpCycles = cycles;
-
-        LiveGame game = new LiveGame(n, m, true);
-        game.initializeImperative(Cell::new);
-
-        s.nextLine();
-
-        if (m < 10 && n < 10)
-            printGrid(game.getCells());
-        long start = System.currentTimeMillis();
-
-        while (cycles > 0) {
-            game.nextIterationFunctional();
-            // game.nextIterationImperative();
-            cycles--;
-        }
-        long totalTime = System.currentTimeMillis() - start;
-        if (m < 10 && n < 10)
-            printGrid(game.getCells());
-        System.out.println(String.format("Total time for %1$d iterations is %2$dms", tmpCycles, totalTime));
     }
 
     /**
@@ -157,14 +130,4 @@ public class LiveGame {
                      .filter(Cell::isLive)
                      .count();
     }
-
-    private static void printGrid(Cell[][] cells) {
-        IntStream.range(0, cells.length).forEach(y -> {
-            IntStream.range(0, cells[y].length).forEach(x -> System.out.print(cells[y][x].isLive() ? x : " "));
-            System.out.println();
-        });
-        System.out.println("---------------------------------------");
-    }
-
-
 }
