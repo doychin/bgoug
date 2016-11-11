@@ -2,6 +2,7 @@ package bgoug.factorial;
 
 import java.util.stream.Stream;
 
+@FunctionalInterface
 public interface TailCall<T> {
     TailCall<T> apply();
 

@@ -1,6 +1,7 @@
 package bgoug.factorial;
 
-import java.util.Scanner;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static bgoug.factorial.TailCalls.call;
 import static bgoug.factorial.TailCalls.done;
@@ -47,20 +48,21 @@ public class Main {
             this.counter = counter;
         }
 
-        private static final ThreadLocal<FactorialResult> instanceCache = new ThreadLocal<FactorialResult>() {
-            @Override
-            protected FactorialResult initialValue() {
-                return new FactorialResult(-1);
-            }
-        };
+//        private static final ThreadLocal<FactorialResult> instanceCache = new ThreadLocal<FactorialResult>() {
+//            @Override
+//            protected FactorialResult initialValue() {
+//                return new FactorialResult(-1);
+//            }
+//        };
 
         private static FactorialResult newInstance(FactorialResult current) {
-            FactorialResult cachedInstance = instanceCache.get();
-            cachedInstance.counter = current.counter - 1;
-            cachedInstance.factorial = current.factorial;
-            cachedInstance.zeroCount = current.zeroCount;
-            instanceCache.set(current);
-            return cachedInstance;
+            // FactorialResult cachedInstance = instanceCache.get();
+            FactorialResult instance = new FactorialResult(current.counter-1);
+            instance.counter = current.counter - 1;
+            instance.factorial = current.factorial;
+            instance.zeroCount = current.zeroCount;
+            // instanceCache.set(current);
+            return instance;
         }
 
         FactorialResult multiply(int i) {

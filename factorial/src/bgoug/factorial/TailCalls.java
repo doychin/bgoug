@@ -1,8 +1,5 @@
 package bgoug.factorial;
 
-/**
- * Created by doychin on 10.11.2016 г..
- */
 public class TailCalls {
     public static <T> TailCall<T> call(final TailCall<T> nextCall) {
         return nextCall;
