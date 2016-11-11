@@ -42,8 +42,8 @@ public class LiveGame {
         long start = System.currentTimeMillis();
 
         while (cycles > 0) {
-            game.nextIterationImperative();
-
+            game.nextIterationFunctional();
+            // game.nextIterationImperative();
             cycles--;
         }
         long totalTime = System.currentTimeMillis() - start;
