@@ -46,8 +46,10 @@ public class LiveGame {
      * Run next game iteration
      */
     void nextIterationFunctional() {
-        constructCellStream(parallelStreams).forEach(this::updateCellState);
-        constructCellStream(parallelStreams).forEach(Cell::apply);
+        constructCellStream(parallelStreams)
+                .forEach(this::updateCellState);
+        constructCellStream(parallelStreams)
+                .forEach(Cell::apply);
     }
 
     /**
@@ -61,7 +63,8 @@ public class LiveGame {
         if (parallel) {
             cellRowsStream = cellRowsStream.parallel();
         }
-        Stream<Cell> cellStream = cellRowsStream.flatMap(Arrays::stream);
+        Stream<Cell> cellStream =
+                cellRowsStream.flatMap(Arrays::stream);
         if (parallel) {
             cellStream = cellStream.parallel();
         }
@@ -89,8 +92,9 @@ public class LiveGame {
         Random r = new Random();
         IntStream.range(0, height).forEach(y ->
                 IntStream.range(0, width)
-                         .forEach(x -> cells[y][x] = cellSupplier.createCell(x, y)
-                                                                 .setLive(r.nextBoolean())));
+                         .forEach(x -> cells[y][x]
+                                 = cellSupplier.createCell(x, y)
+                                               .setLive(r.nextBoolean())));
     }
 
     private void updateCellState(Cell cell) {
